@@ -21,6 +21,29 @@
   <div id="notes"></div>
 
   <script>
+    function createNoteElement(note) {
+      const wrapper = document.createElement("div");
+
+      const title = document.createElement("h3");
+      title.textContent = note.title;
+
+      const content = document.createElement("p");
+      content.textContent = note.content;
+
+      const author = document.createElement("p");
+      author.textContent = note.author;
+
+      const id = document.createElement("p");
+      id.textContent = `ID: ${note.id}`;
+
+      wrapper.appendChild(title);
+      wrapper.appendChild(content);
+      wrapper.appendChild(author);
+      wrapper.appendChild(id);
+
+      return wrapper;
+    }
+
     async function loadNotes() {
       const res = await fetch("/api/notes");
       const notes = await res.json();
@@ -28,15 +51,8 @@
       const div = document.getElementById("notes");
       div.innerHTML = "";
 
-      notes.forEach(n => {
-        div.innerHTML += `
-          <div>
-            <h3>${n.title}</h3>
-            <p>${n.content}</p>
-            <p>${n.author}</p>
-            <p>ID: ${n.id}</p>
-          </div>
-        `;
+      notes.forEach(note => {
+        div.appendChild(createNoteElement(note));
       });
     }
 
@@ -47,7 +63,7 @@
 
       await fetch("/api/notes", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, author, content })
       });
 
