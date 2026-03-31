@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Notes</title>
+</head>
+<body>
+  <h1>Team Notes</h1>
+
+  <input id="title" placeholder="Title" />
+  <input id="author" placeholder="Author" />
+  <textarea id="content" placeholder="Content"></textarea>
+  <button onclick="addNote()">Add</button>
+
+  <br><br>
+
+  <input id="deleteId" placeholder="Note ID" />
+  <input id="adminToken" placeholder="Admin Token" />
+  <button onclick="deleteNote()">Delete</button>
+
+  <h2>Notes</h2>
+  <div id="notes"></div>
+
+  <script>
+    async function loadNotes() {
+      const res = await fetch("/api/notes");
+      const notes = await res.json();
+
+      const div = document.getElementById("notes");
+      div.innerHTML = "";
+
+      notes.forEach(n => {
+        div.innerHTML += `
+          <div>
+            <h3>${n.title}</h3>
+            <p>${n.content}</p>
+            <p>${n.author}</p>
+            <p>ID: ${n.id}</p>
+          </div>
+        `;
+      });
+    }
+
+    async function addNote() {
+      const title = document.getElementById("title").value;
+      const author = document.getElementById("author").value;
+      const content = document.getElementById("content").value;
+
+      await fetch("/api/notes", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ title, author, content })
+      });
+
+      loadNotes();
+    }
+
+    async function deleteNote() {
+      const id = document.getElementById("deleteId").value;
+      const token = document.getElementById("adminToken").value;
+
+      await fetch(`/api/notes/${id}`, {
+        method: "DELETE",
+        headers: { "x-admin-token": token }
+      });
+
+      loadNotes();
+    }
+
+    loadNotes();
+  </script>
+</body>
+</html>
