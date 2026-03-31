@@ -22,19 +22,57 @@ function saveNotes(notes) {
   fs.writeFileSync(dataFile, JSON.stringify(notes, null, 2));
 }
 
+function isValidTitle(title) {
+  if (typeof title !== "string") return false;
+  if (title.trim().length === 0 || title.length > 100) return false;
+  return /^[a-zA-Z0-9\s.,!?'"\-]+$/.test(title);
+}
+
+function isValidAuthor(author) {
+  if (typeof author !== "string") return false;
+  if (author.trim().length === 0 || author.length > 50) return false;
+  return /^[a-zA-Z0-9\s.\-']+$/.test(author);
+}
+
+function isValidContent(content) {
+  if (typeof content !== "string") return false;
+  if (content.trim().length === 0 || content.length > 500) return false;
+  return true;
+}
+
 app.get("/api/notes", (req, res) => {
   const notes = getNotes();
   res.json(notes);
 });
 
 app.post("/api/notes", (req, res) => {
+  const { title, author, content } = req.body;
+
+  if (!isValidTitle(title)) {
+    return res.status(400).json({
+      error: "Invalid title."
+    });
+  }
+
+  if (!isValidAuthor(author)) {
+    return res.status(400).json({
+      error: "Invalid author."
+    });
+  }
+
+  if (!isValidContent(content)) {
+    return res.status(400).json({
+      error: "Invalid content."
+    });
+  }
+
   const notes = getNotes();
 
   const newNote = {
     id: Date.now(),
-    title: req.body.title,
-    content: req.body.content,
-    author: req.body.author
+    title: title.trim(),
+    content: content.trim(),
+    author: author.trim()
   };
 
   notes.push(newNote);
