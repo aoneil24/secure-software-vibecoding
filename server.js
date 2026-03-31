@@ -1,11 +1,12 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config();
 
 const app = express();
 const PORT = 3000;
 
-const ADMIN_TOKEN = "super-secret-admin-token";
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
